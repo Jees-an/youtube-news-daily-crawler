@@ -1,0 +1,44 @@
+name: YouTube News Metadata Daily Crawl
+
+on:
+  schedule:
+    # 매일 한국 시간(KKST) 새벽 3시(오전 3시)에 워크플로 실행
+    # KST 03:00은 UTC로 전날 18:00(오후 6시)에 해당합니다.
+    # (KST = UTC + 9시간)
+    - cron: '0 18 * * *' # UTC 18:00 (한국 시간 새벽 3시)
+  # 수동 실행을 위한 workflow_dispatch 추가 (선택 사항)
+  workflow_dispatch:
+
+jobs:
+  run-crawler:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run YouTube Crawler Script
+        env:
+          
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          python collect_news_metadata.py # 스크립트 파일명 변경
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "feat: Daily YouTube video metadata update"
+          branch: main
+          
+          commit_user_name: 'github-actions[bot]'
+          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
