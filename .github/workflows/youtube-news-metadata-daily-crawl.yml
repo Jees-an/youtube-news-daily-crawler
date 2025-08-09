@@ -11,34 +11,46 @@ on:
 
 jobs:
   run-crawler:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # GitHub Actions가 실행될 운영체제 환경
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository # GitHub 저장소 코드 가져오기
         uses: actions/checkout@v4
 
-      - name: Set up Python environment
+      - name: Set up Python environment # Python 3.x 환경 설정
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Install Python dependencies
+      - name: Install Python dependencies # requirements.txt에 명시된 라이브러리 설치
         run: |
           pip install -r requirements.txt
 
-      - name: Run YouTube Crawler Script
+      # --- 디버깅을 위한 새로운 단계 시작 ---
+      - name: List files in repository root # 저장소 루트 폴더의 파일 목록 확인
+        run: |
+          ls -R . # 현재 디렉토리 및 하위 디렉토리의 모든 파일/폴더를 재귀적으로 나열
+
+      - name: Check data directory contents # data 폴더 내용 확인
+        run: |
+          ls -l data/ # data 폴더의 상세 내용 나열
+        # data 폴더가 없을 경우 오류가 발생할 수 있으므로, 에러를 무시하도록 설정 (선택 사항)
+        # continue-on-error: true
+      # --- 디버깅을 위한 새로운 단계 끝 ---
+
+      - name: Run YouTube Crawler Script # 파이썬 스크립트 실행
         env:
-          
+          # GitHub Secrets에 등록된 YOUTUBE_API_KEY를 환경 변수로 전달
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: |
           python collect_news_metadata.py # 스크립트 파일명 변경
 
-      - name: Commit and push changes
+      - name: Commit and push changes # 스크립트 실행 결과 (CSV 파일)를 저장소에 커밋
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "feat: Daily YouTube video metadata update"
-          branch: main
-          
+          commit_message: "feat: Daily YouTube video metadata update" # 커밋 메시지
+          branch: main # 변경 사항을 푸시할 브랜치 (기본적으로 main)
+          # GitHub Actions 봇의 커밋 정보 설정
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
           commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
