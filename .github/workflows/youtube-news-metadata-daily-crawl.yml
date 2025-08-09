@@ -9,16 +9,13 @@ jobs:
   run-crawler:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write   # 아래 auto-commit용 (필요)
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: true            # <- LFS 실제 파일 받기
-          # submodules: recursive  # (서브모듈 쓰면 주석 해제)
+          lfs: true
+          # submodules: recursive
 
       - name: Set up Python environment
         uses: actions/setup-python@v5
@@ -55,17 +52,17 @@ jobs:
           fi
 
       - name: Run YouTube Crawler Script
-        working-directory: ${{ github.workspace }}   # 명시적으로 루트에서 실행
+        working-directory: ${{ github.workspace }}
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: |
           python collect_news_metadata.py
 
-      - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Upload artifact (metadata)
+        uses: actions/upload-artifact@v4
         with:
-          commit_message: "feat: Daily YouTube video metadata update"
-          branch: main
-          commit_user_name: 'github-actions[bot]'
-          commit_user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+          name: youtube-output-${{ github.run_number }}
+          path: out/*.csv.gz   # collect_news_metadata.py에서 out 폴더로 저장
+          if-no-files-found: error
+          retention-days: 60
+          compression-level: 9
