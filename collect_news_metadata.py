@@ -215,13 +215,13 @@ if __name__ == '__main__':
         channels_to_process = dict(zip(channel_names, channel_ids))
 
     except FileNotFoundError:
-        print(f"오류: Excel 파일 '{channel_id_list_path}'을(를) 찾을 수 없습니다.")
+        print(f"오류: CSV 파일 '{channel_id_list_path}'을(를) 찾을 수 없습니다.")
         exit(1)
     except KeyError:
-        print("오류: Excel 파일에 '채널 ID' 또는 '채널명' 열이 없습니다. 컬럼명을 확인해주세요.")
+        print("오류: CSV 파일에 '채널 ID' 또는 '채널명' 열이 없습니다. 컬럼명을 확인해주세요.")
         exit(1)
     except Exception as e:
-        print(f"Excel 파일 읽기 중 오류 발생: {e}")
+        print(f"CSV 파일 읽기 중 오류 발생: {e}")
         exit(1)
 
     api_key = os.environ.get('YOUTUBE_API_KEY')
@@ -264,4 +264,4 @@ if __name__ == '__main__':
             print("\n수집된 동영상 데이터가 없어 CSV 파일을 생성하지 않습니다.")
 
     else:
-        print("Excel 파일에서 유효한 채널 ID를 찾을 수 없습니다. 목록을 확인해주세요.")
+        print("CSV 파일에서 유효한 채널 ID를 찾을 수 없습니다. 목록을 확인해주세요.")
