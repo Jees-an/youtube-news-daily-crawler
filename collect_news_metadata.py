@@ -247,21 +247,23 @@ if __name__ == '__main__':
                 print("-" * 20)
             else:
                 print(f"채널 '{news_name}'에서 어제 업로드된 동영상을 찾지 못했거나 오류가 발생했습니다.")
-        
+
         if all_videos_data:
             df = pd.DataFrame(all_videos_data)
-            
+
+            output_dir = Path(__file__).resolve().parent / "out"
+            output_dir.mkdir(exist_ok=True)
+
             current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            output_filename = f"youtube_videos_metadata_{current_time}.csv"
-            
+            output_path = output_dir / f"youtube_news_metadata_{current_time}.csv.gz"
+
             try:
-                df.to_csv(output_filename, index=False, encoding='utf-8-sig')
-                print(f"\n모든 동영상 메타데이터를 '{output_filename}' 파일에 저장했습니다.")
+                df.to_csv(output_path, index=False, encoding='utf-8-sig', compression='gzip')
+                print(f"\n모든 동영상 메타데이터를 '{output_path}'(으)로 저장했습니다.")
                 print(f"총 {len(all_videos_data)}개의 동영상 데이터가 저장되었습니다.")
             except Exception as e:
                 print(f"\nCSV 파일 저장 중 오류 발생: {e}")
         else:
             print("\n수집된 동영상 데이터가 없어 CSV 파일을 생성하지 않습니다.")
-
     else:
         print("CSV 파일에서 유효한 채널 ID를 찾을 수 없습니다. 목록을 확인해주세요.")
