@@ -3,6 +3,7 @@ import re
 import time
 import datetime
 import pandas as pd
+from pathlib import Path
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError, ResumableUploadError
 
@@ -206,23 +207,22 @@ def get_yesterday_videos(channel_id, api_key, max_retries=3, initial_delay=2):
     return video_metadata
 
 if __name__ == '__main__':
-    channel_id_list_path = r'data\youtube_news_channel_list.csv'
-    
+    channel_id_list_path = Path(__file__).resolve().parent / 'data' / 'youtube_news_channel_list.csv'
+
     try:
-        channel_id_list_df = pd.read_csv(channel_id_list_path)
+        channel_id_list_df = pd.read_csv(channel_id_list_path, encoding='utf-8-sig')
         channel_ids = channel_id_list_df['채널 ID'].tolist()
         channel_names = channel_id_list_df['채널명'].tolist()
         channels_to_process = dict(zip(channel_names, channel_ids))
-
     except FileNotFoundError:
-        print(f"오류: CSV 파일 '{channel_id_list_path}'을(를) 찾을 수 없습니다.")
-        exit(1)
+        print(f"오류: CSV 파일을 찾을 수 없습니다: {channel_id_list_path}")
+        raise
     except KeyError:
-        print("오류: CSV 파일에 '채널 ID' 또는 '채널명' 열이 없습니다. 컬럼명을 확인해주세요.")
-        exit(1)
+        print("오류: CSV 파일에 '채널 ID' 또는 '채널명' 열이 없습니다.")
+        raise
     except Exception as e:
         print(f"CSV 파일 읽기 중 오류 발생: {e}")
-        exit(1)
+        raise
 
     api_key = os.environ.get('YOUTUBE_API_KEY')
 
