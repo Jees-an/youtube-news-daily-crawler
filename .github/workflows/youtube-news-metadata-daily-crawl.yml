@@ -15,16 +15,18 @@ jobs:
         with:
           fetch-depth: 0
           lfs: true
-          # submodules: recursive
 
       - name: Set up Python environment
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.11'
 
       - name: Install Python dependencies
         run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade packaging
           pip install -r requirements.txt
+          pip check
 
       # --- 디버깅 & 존재 검증 ---
       - name: List files in repository root
@@ -62,7 +64,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: youtube-output-${{ github.run_number }}
-          path: out/*.csv.gz   # collect_news_metadata.py에서 out 폴더로 저장
+          path: out/*.csv.gz
           if-no-files-found: error
           retention-days: 60
           compression-level: 9
